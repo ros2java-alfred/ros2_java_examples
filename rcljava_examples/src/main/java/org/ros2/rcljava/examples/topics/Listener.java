@@ -17,7 +17,7 @@ package org.ros2.rcljava.examples.topics;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
-import org.ros2.rcljava.node.topic.Consumer;
+import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.Subscription;
 
 public class Listener {
@@ -39,12 +39,12 @@ public class Listener {
         Subscription<std_msgs.msg.String> sub = node.<std_msgs.msg.String>createSubscription(
             std_msgs.msg.String.class,
             "chatter",
-            new Consumer<std_msgs.msg.String>() {
+            new SubscriptionCallback<std_msgs.msg.String>() {
                 // We define the callback inline, this works with Java 8's lambdas too, but we use
                 // our own Consumer interface because Android supports lambdas via retrolambda, but not
                 // the lambda API
                 @Override
-                public void accept(std_msgs.msg.String msg) {
+                public void dispatch(std_msgs.msg.String msg) {
                     Listener.chatterCallback(msg);
                 }
             });

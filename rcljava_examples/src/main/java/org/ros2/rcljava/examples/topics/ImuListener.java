@@ -18,7 +18,7 @@ package org.ros2.rcljava.examples.topics;
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
-import org.ros2.rcljava.node.topic.Consumer;
+import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.Subscription;
 
 public class ImuListener {
@@ -43,12 +43,12 @@ public class ImuListener {
         Subscription<sensor_msgs.msg.Imu> sub = node.<sensor_msgs.msg.Imu>createSubscription(
                 sensor_msgs.msg.Imu.class,
                 "imu",
-                new Consumer<sensor_msgs.msg.Imu>() {
+                new SubscriptionCallback<sensor_msgs.msg.Imu>() {
                     // We define the callback inline, this works with Java 8's lambdas too, but we use
                     // our own Consumer interface because Android supports lambdas via retrolambda, but not
                     // the lambda API
                     @Override
-                    public void accept(sensor_msgs.msg.Imu msg) {
+                    public void dispatch(sensor_msgs.msg.Imu msg) {
                         ImuListener.imuCb(msg);
                     }
                 },

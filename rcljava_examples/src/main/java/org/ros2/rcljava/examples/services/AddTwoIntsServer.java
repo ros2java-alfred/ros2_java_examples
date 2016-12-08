@@ -18,7 +18,7 @@ package org.ros2.rcljava.examples.services;
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Service;
-import org.ros2.rcljava.node.service.TriConsumer;
+import org.ros2.rcljava.node.service.ServiceCallback;
 import org.ros2.rcljava.node.service.RMWRequestId;
 
 import example_interfaces.srv.AddTwoInts;
@@ -49,7 +49,7 @@ public class AddTwoIntsServer {
         Service<AddTwoInts> service = node.<AddTwoInts>createService(
                 AddTwoInts.class,
                 "add_two_ints",
-                new TriConsumer<RMWRequestId, AddTwoInts_Request, AddTwoInts_Response>() {
+                new ServiceCallback<AddTwoInts_Request, AddTwoInts_Response>() {
 
                     // We define the callback inline, this works with Java 8's
                     // lambdas
@@ -57,7 +57,7 @@ public class AddTwoIntsServer {
                     // Android
                     // supports lambdas via retrolambda, but not the lambda API
                     @Override
-                    public void accept(
+                    public void dispatch(
                             final RMWRequestId header,
                             final AddTwoInts_Request request,
                             final AddTwoInts_Response response) {
