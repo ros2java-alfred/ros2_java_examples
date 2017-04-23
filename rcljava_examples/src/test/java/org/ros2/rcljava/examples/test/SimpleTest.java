@@ -29,7 +29,6 @@ import org.ros2.rcljava.node.topic.Publisher;
 
 
 public class SimpleTest {
-    private static final String NODE_NAME = SimpleTest.class.getName();
     private static final Logger logger = LoggerFactory.getLogger(SimpleTest.class);
 
     @BeforeClass
@@ -46,7 +45,7 @@ public class SimpleTest {
         RCLJava.rclJavaInit();
 
         // Let's create a Node
-        Node node = RCLJava.createNode(NODE_NAME);
+        Node node = RCLJava.createNode("_test_example");
 
         // Testing Publisher
         //-------------------------------------------------------------------------------------------------------------
