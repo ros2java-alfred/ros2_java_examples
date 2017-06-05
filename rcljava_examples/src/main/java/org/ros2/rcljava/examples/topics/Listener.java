@@ -29,7 +29,7 @@ public class Listener {
 
     public static void main(String[] args) throws InterruptedException {
         // Initialize RCL
-        RCLJava.rclJavaInit();
+        RCLJava.rclJavaInit(args);
 
         // Let's create a new Node
         Node node = RCLJava.createNode(NODE_NAME);
