@@ -1,5 +1,6 @@
 .gradle
 build/
+log4j.properties
 
 # Ignore Gradle GUI config
 gradle-app.setting
