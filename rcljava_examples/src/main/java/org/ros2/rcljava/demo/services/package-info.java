@@ -15,6 +15,6 @@
  */
 
 /**
- * <b>ROS2 rcljava</b> parameters examples.
+ * <b>ROS2 rcljava</b> services examples.
  */
-package org.ros2.rcljava.examples.parameters;
+package org.ros2.rcljava.demo.services;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava.examples.services;
+package org.ros2.rcljava.demo.services;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;

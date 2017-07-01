@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava.examples.topics;
+package org.ros2.rcljava.demo.topics;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.Node;
@@ -48,6 +48,7 @@ public class Talker {
             Thread.sleep(500);
             i++;
         }
+        RCLJava.spin(node);
 
         chatter_pub.dispose();
         node.dispose();

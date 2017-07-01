@@ -17,36 +17,36 @@ ament {
 
     scripts {
         list_parameters_java {
-            mainClassName = 'org.ros2.rcljava.examples.parameters.ListParameters'
+            mainClassName = 'org.ros2.rcljava.demo.parameters.ListParameters'
         }
         parameter_events_java {
-            mainClassName = 'org.ros2.rcljava.examples.parameters.ParameterEvents'
+            mainClassName = 'org.ros2.rcljava.demo.parameters.ParameterEvents'
         }
         set_and_get_parameters_java {
-            mainClassName = 'org.ros2.rcljava.examples.parameters.SetAndGetParameters'
+            mainClassName = 'org.ros2.rcljava.demo.parameters.SetAndGetParameters'
         }
 
         add_two_ints_client_java {
-            mainClassName = 'org.ros2.rcljava.examples.services.AddTwoIntsClient'
+            mainClassName = 'org.ros2.rcljava.demo.services.AddTwoIntsClient'
         }
         add_two_ints_server_java {
-            mainClassName = 'org.ros2.rcljava.examples.services.AddTwoIntsServer'
+            mainClassName = 'org.ros2.rcljava.demo.services.AddTwoIntsServer'
         }
 
         imu_listener_java {
-            mainClassName = 'org.ros2.rcljava.examples.topics.ImuListener'
+            mainClassName = 'org.ros2.rcljava.demo.topics.ImuListener'
         }
         listener_java {
-            mainClassName = 'org.ros2.rcljava.examples.topics.Listener'
+            mainClassName = 'org.ros2.rcljava.demo.topics.Listener'
         }
         listener_best_effort_java {
-            mainClassName = 'org.ros2.rcljava.examples.topics.ListenerBestEffort'
+            mainClassName = 'org.ros2.rcljava.demo.topics.ListenerBestEffort'
         }
         talker_java {
-            mainClassName = 'org.ros2.rcljava.examples.topics.Talker'
+            mainClassName = 'org.ros2.rcljava.demo.topics.Talker'
         }
         talker_best_effort_java {
-            mainClassName = 'org.ros2.rcljava.examples.topics.TalkerBestEffort'
+            mainClassName = 'org.ros2.rcljava.demo.topics.TalkerBestEffort'
         }
     }
 }

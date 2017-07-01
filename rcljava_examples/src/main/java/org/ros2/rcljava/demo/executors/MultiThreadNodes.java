@@ -12,12 +12,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.ros2.rcljava.examples.executors;
+package org.ros2.rcljava.demo.executors;
 
 import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.RCLJava;
-import org.ros2.rcljava.executor.SingleThreadedExecutor;
+import org.ros2.rcljava.executor.MultiThreadedExecutor;
 import org.ros2.rcljava.executor.ThreadedExecutor;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.NativePublisher;
@@ -26,7 +26,7 @@ import org.ros2.rcljava.node.topic.SubscriptionCallback;
 
 import std_msgs.msg.UInt32;
 
-public class SingleThreadNodes {
+public class MultiThreadNodes {
 
     public static class TestConsumer implements SubscriptionCallback<UInt32> {
         private String name;
@@ -39,7 +39,7 @@ public class SingleThreadNodes {
             System.out.println(this.name + " : " + Thread.currentThread().getId() + " :  " + msg.getData());
 
             // For test if thread-safe
-//            throw new NullPointerException();
+          throw new NullPointerException();
         }
     }
 
@@ -48,7 +48,7 @@ public class SingleThreadNodes {
         RCLJava.rclJavaInit(args);
 
         // Create executor
-        ThreadedExecutor executor = new SingleThreadedExecutor();
+        ThreadedExecutor executor = new MultiThreadedExecutor();
         executor.spin();
 
         // Let's create a new Node
@@ -83,7 +83,6 @@ public class SingleThreadNodes {
 
         final long millis = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - then);
         System.out.println("Slept for (ms): " + millis); // = something around 1000.
-
 
         executor.removeNode(subscriptionNodeTwo);
         executor.removeNode(subscriptionNodeOne);

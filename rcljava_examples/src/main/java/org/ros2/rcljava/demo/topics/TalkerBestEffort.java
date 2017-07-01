@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.ros2.rcljava.examples.topics;
+package org.ros2.rcljava.demo.topics;
 
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.Publisher;
