@@ -15,6 +15,6 @@
  */
 
 /**
- * <b>ROS2 rcljava</b> services examples.
+ * <b>ROS2 rcljava</b> services demo.
  */
 package org.ros2.rcljava.demo.services;

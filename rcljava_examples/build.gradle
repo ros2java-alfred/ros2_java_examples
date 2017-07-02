@@ -33,6 +33,13 @@ ament {
             mainClassName = 'org.ros2.rcljava.demo.services.AddTwoIntsServer'
         }
 
+        one_off_timer_java {
+            mainClassName = 'org.ros2.rcljava.demo.timers.OneOffTimer'
+        }
+        reuse_timer_java {
+            mainClassName = 'org.ros2.rcljava.demo.timers.ReuseTimer'
+        }
+
         imu_listener_java {
             mainClassName = 'org.ros2.rcljava.demo.topics.ImuListener'
         }

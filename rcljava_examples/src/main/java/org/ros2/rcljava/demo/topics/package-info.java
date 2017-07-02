@@ -15,6 +15,6 @@
  */
 
 /**
- * <b>ROS2 rcljava</b> topics examples.
+ * <b>ROS2 rcljava</b> topics demo.
  */
 package org.ros2.rcljava.demo.topics;

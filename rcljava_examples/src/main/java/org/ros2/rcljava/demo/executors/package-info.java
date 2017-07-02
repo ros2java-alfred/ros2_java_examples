@@ -14,6 +14,6 @@
  */
 
 /**
- * <b>ROS2 rcljava</b> executors examples.
+ * <b>ROS2 rcljava</b> executors demo.
  */
 package org.ros2.rcljava.demo.executors;
