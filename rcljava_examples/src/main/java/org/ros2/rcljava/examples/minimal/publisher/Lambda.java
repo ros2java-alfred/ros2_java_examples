@@ -36,7 +36,6 @@ public class Lambda {
                             "topic");
 
             this.timer = this.createWallTimer(500, TimeUnit.MILLISECONDS, () -> tick() );
-            this.timer.getHandle(); // Disable Warning
         }
 
         public void tick() {

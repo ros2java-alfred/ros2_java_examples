@@ -33,7 +33,6 @@ public class PublisherNode extends NativeNode implements WallTimerCallback {
                 "topic");
 
         this.timer = this.createWallTimer(500, TimeUnit.MILLISECONDS, this);
-        this.timer.getHandle(); // Disable Warning
     }
 
     @Override

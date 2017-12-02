@@ -24,16 +24,13 @@ public class SubscriberNode extends NativeNode {
 
     public SubscriberNode() {
         super("subscriber_node");
-     // Subscriptions are type safe, so we'll pass the message type. We use the fully
-        // qualified
+        // Subscriptions are type safe, so we'll pass the message type. We use the fully qualified
         // class name to avoid any collision with Java's String class
         this.sub = this.<std_msgs.msg.String>createSubscription(std_msgs.msg.String.class, "topic",
                 new SubscriptionCallback<std_msgs.msg.String>() {
-                    // We define the callback inline, this works with Java 8's lambdas too, but we
-                    // use
+                    // We define the callback inline, this works with Java 8's lambdas too, but we use
                     // our own Consumer interface because Android supports lambdas via retrolambda,
-                    // but not
-                    // the lambda API
+                    // but not the lambda API
                     @Override
                     public void dispatch(std_msgs.msg.String msg) {
                         MinimalSubscriber.chatterCallback(msg);

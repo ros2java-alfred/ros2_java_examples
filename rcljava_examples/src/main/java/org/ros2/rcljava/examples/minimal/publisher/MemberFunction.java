@@ -37,7 +37,6 @@ public class MemberFunction {
                             "topic");
 
             this.timer = this.createWallTimer(500, TimeUnit.MILLISECONDS, this);
-            this.timer.getHandle(); // Disable Warning
         }
 
         @Override
