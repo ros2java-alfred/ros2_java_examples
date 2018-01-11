@@ -17,50 +17,55 @@ package org.ros2.rcljava.demo.topics;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.qos.QoSProfile;
+import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.Subscription;
 
-public class ListenerBestEffort {
+public class ListenerBestEffort extends NativeNode {
 
-  public static void chatterCallback(final std_msgs.msg.String msg) {
-    System.out.println("I heard: " + msg.getData());
-  }
+    private Subscription<std_msgs.msg.String> sub;
 
-  public static void main(final String[] args) throws InterruptedException {
+    public ListenerBestEffort() {
+        super("listener");
 
-    // Initialize RCL
-    RCLJava.rclJavaInit();
+        SubscriptionCallback<std_msgs.msg.String> callback = new SubscriptionCallback<std_msgs.msg.String>(){
+            // We define the callback inline, this works with Java 8's lambdas
+            // too, but we use our own Consumer interface because Android
+            // supports lambdas via retrolambda, but not the lambda API
+            @Override
+            public void dispatch(final std_msgs.msg.String msg) {
+                System.out.println("I heard: " + msg.getData());
+            }
+        };
 
-    // Let's create a new Node
-    Node node = RCLJava.createNode("listener");
-
-    // Subscriptions are type safe, so we'll pass the message type. We use the
-    // fully qualified class name to avoid any collision with Java's String
-    // class
-    Subscription<std_msgs.msg.String> sub =
-        node.<std_msgs.msg.String>createSubscription(
-            std_msgs.msg.String.class,
-            "chatter",
-            new SubscriptionCallback<std_msgs.msg.String>() {
-
-                // We define the callback inline, this works with Java 8's lambdas
-                // too, but we use our own Consumer interface because Android
-                // supports lambdas via retrolambda, but not the lambda API
-                @Override
-                public void dispatch(final std_msgs.msg.String msg) {
-                  chatterCallback(msg);
-                }
-            },
-            QoSProfile.SENSOR_DATA
-    );
-
-    while (RCLJava.ok()) {
-      RCLJava.spinOnce(node);
+        // Subscriptions are type safe, so we'll pass the message type. We use the
+        // fully qualified class name to avoid any collision with Java's String
+        // class
+        this.sub = this.<std_msgs.msg.String>createSubscription(
+                std_msgs.msg.String.class,
+                "chatter",
+                callback,
+                QoSProfile.SENSOR_DATA);
     }
 
-    sub.dispose();
-    node.dispose();
-    RCLJava.shutdown();
-  }
+    @Override
+    public void dispose() {
+        this.sub.dispose();
+        super.dispose();
+    }
+
+    public static void main(final String[] args) throws InterruptedException {
+
+        // Initialize RCL
+        RCLJava.rclJavaInit();
+
+        // Let's create a new Node
+        Node node = new ListenerBestEffort();
+
+        RCLJava.spin(node);
+
+        node.dispose();
+        RCLJava.shutdown();
+    }
 }

@@ -15,42 +15,69 @@
  */
 package org.ros2.rcljava.demo.topics;
 
+import java.util.concurrent.TimeUnit;
+
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.Publisher;
+import org.ros2.rcljava.qos.QoSProfile;
+import org.ros2.rcljava.time.WallTimer;
+import org.ros2.rcljava.time.WallTimerCallback;
 
-public class Talker {
+public class Talker extends NativeNode {
+
     private static final String NODE_NAME = Talker.class.getSimpleName().toLowerCase();
 
-    public static void main(String[] args) throws InterruptedException {
+    private int i = 1;
+    private std_msgs.msg.String msg;
+    private Publisher<std_msgs.msg.String> pub;
+    private WallTimer timer;
 
-        int i = 1;
+    public Talker(String topic) {
+        super(NODE_NAME);
+
+        this.msg = new std_msgs.msg.String();
+
+        WallTimerCallback publish_message = new WallTimerCallback() {
+
+            @Override
+            public void tick() {
+                msg.setData("Hello World: " + i++);
+
+                System.out.println("Publishing: \"" + msg.getData() + "\"");
+                pub.publish(msg);
+            }
+        };
+
+        QoSProfile qos = QoSProfile.DEFAULT;
+        //TODO qos.setDepth(7);
+
+        this.pub = this.<std_msgs.msg.String>createPublisher(
+                    std_msgs.msg.String.class,
+                    topic,
+                    qos);
+
+        this.timer = this.createWallTimer(1, TimeUnit.SECONDS, publish_message);
+    }
+
+    @Override
+    public void dispose() {
+        this.timer.dispose();
+        this.pub.dispose();
+        super.dispose();
+    }
+
+    public static void main(String[] args) throws InterruptedException {
 
         // Initialize RCL
         RCLJava.rclJavaInit();
 
         // Let's create a Node
-        Node node = RCLJava.createNode(NODE_NAME);
+        Node node = new Talker("chatter");
 
-        std_msgs.msg.String msg = new std_msgs.msg.String();
-        Publisher<std_msgs.msg.String> chatter_pub =
-                node.<std_msgs.msg.String>createPublisher(
-                    std_msgs.msg.String.class,
-                    "chatter");
-
-        while(RCLJava.ok()) {
-            msg.setData("Hello World: " + i);
-
-            System.out.println("Publishing: \"" + msg.getData() + "\"");
-            chatter_pub.publish(msg);
-
-            // Sleep a little bit between each message
-            Thread.sleep(500);
-            i++;
-        }
         RCLJava.spin(node);
 
-        chatter_pub.dispose();
         node.dispose();
         RCLJava.shutdown();
     }

@@ -16,38 +16,67 @@
 
 package org.ros2.rcljava.demo.topics;
 
+import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.Publisher;
 import org.ros2.rcljava.qos.QoSProfile;
+import org.ros2.rcljava.time.WallTimer;
+import org.ros2.rcljava.time.WallTimerCallback;
+
+import java.util.concurrent.TimeUnit;
+
 import org.ros2.rcljava.RCLJava;
 
 
-public class TalkerBestEffort {
-  public static void main(String[] args) throws InterruptedException {
-    // Initialize RCL
-    RCLJava.rclJavaInit();
+public class TalkerBestEffort extends NativeNode {
 
-    // Let's create a Node
-    Node node = RCLJava.createNode("talker");
+    private int i = 1;
+    private std_msgs.msg.String msg;
+    private Publisher<std_msgs.msg.String> pub;
+    private WallTimer timer;
 
-    // Publishers are type safe, make sure to pass the message type
-    Publisher<std_msgs.msg.String> chatterPublisher =
-        node.<std_msgs.msg.String>createPublisher(
-        std_msgs.msg.String.class, "chatter",
-        QoSProfile.SENSOR_DATA);
+    public TalkerBestEffort() {
+        super("talker");
 
-    std_msgs.msg.String msg = new std_msgs.msg.String();
+        this.msg = new std_msgs.msg.String();
 
-    int i = 1;
+        WallTimerCallback publish_message = new WallTimerCallback() {
 
-    while (RCLJava.ok()) {
-      msg.setData("Hello World: " + i);
-      i++;
-      System.out.println("Publishing: \"" + msg.getData() + "\"");
-      chatterPublisher.publish(msg);
+            @Override
+            public void tick() {
+                msg.setData("Hello World: " + i++);
 
-      // Sleep a little bit between each message
-      Thread.sleep(1000);
+                System.out.println("Publishing: \"" + msg.getData() + "\"");
+                pub.publish(msg);
+            }
+        };
+
+        this.pub = this.<std_msgs.msg.String>createPublisher(
+                    std_msgs.msg.String.class,
+                    "chatter",
+                    QoSProfile.SENSOR_DATA);
+
+        this.timer = this.createWallTimer(50, TimeUnit.MILLISECONDS, publish_message);
     }
-  }
+
+    @Override
+    public void dispose() {
+        this.timer.dispose();
+        this.pub.dispose();
+        super.dispose();
+    }
+
+    public static void main(String[] args) throws InterruptedException {
+
+        // Initialize RCL
+        RCLJava.rclJavaInit();
+
+        // Let's create a Node
+        Node node = new TalkerBestEffort();
+
+        RCLJava.spin(node);
+
+        node.dispose();
+        RCLJava.shutdown();
+    }
 }

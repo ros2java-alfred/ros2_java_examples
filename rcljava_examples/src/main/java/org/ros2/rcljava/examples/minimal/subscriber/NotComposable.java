@@ -15,7 +15,6 @@
 package org.ros2.rcljava.examples.minimal.subscriber;
 
 import org.ros2.rcljava.RCLJava;
-import org.ros2.rcljava.demo.topics.Listener;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.Subscription;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
@@ -50,7 +49,7 @@ public class NotComposable {
                 // the lambda API
                 @Override
                 public void dispatch(std_msgs.msg.String msg) {
-                    Listener.chatterCallback(msg);
+                    System.out.println("I heard: [" + msg.getData() + "]");
                 }
             });
 

@@ -17,19 +17,43 @@ package org.ros2.rcljava.demo.topics;
 
 import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.Subscription;
 
-public class ImuListener {
-    private static final String NODE_NAME = Listener.class.getSimpleName().toLowerCase();
+public class ImuListener extends NativeNode {
 
-    private static void imuCb(final sensor_msgs.msg.Imu msg)
-    {
-        System.out.println(String.format(" accel: [%+6.3f %+6.3f %+6.3f]\n",
-            msg.getLinearAcceleration().getX(),
-            msg.getLinearAcceleration().getY(),
-            msg.getLinearAcceleration().getZ()));
+    private Subscription<sensor_msgs.msg.Imu> sub;
+
+    public ImuListener() {
+        super("imu_listener");
+
+        SubscriptionCallback<sensor_msgs.msg.Imu> imu_cb = new SubscriptionCallback<sensor_msgs.msg.Imu>() {
+            // We define the callback inline, this works with Java 8's lambdas too, but we use
+            // our own Consumer interface because Android supports lambdas via retrolambda, but not
+            // the lambda API
+            @Override
+            public void dispatch(sensor_msgs.msg.Imu msg) {
+                System.out.println(String.format(" accel: [%+6.3f %+6.3f %+6.3f]\n",
+                        msg.getLinearAcceleration().getX(),
+                        msg.getLinearAcceleration().getY(),
+                        msg.getLinearAcceleration().getZ()));
+            }
+        };
+
+        // Subscriptions are type safe, so we'll pass the message type.
+        this.sub = this.<sensor_msgs.msg.Imu>createSubscription(
+                sensor_msgs.msg.Imu.class,
+                "imu",
+                imu_cb,
+                QoSProfile.SENSOR_DATA);
+    }
+
+    @Override
+    public void dispose() {
+        this.sub.dispose();
+        super.dispose();
     }
 
     public static void main(String[] args) throws InterruptedException {
@@ -37,26 +61,10 @@ public class ImuListener {
         RCLJava.rclJavaInit();
 
         // Let's create a new Node
-        Node node = RCLJava.createNode(NODE_NAME);
-
-        // Subscriptions are type safe, so we'll pass the message type.
-        Subscription<sensor_msgs.msg.Imu> sub = node.<sensor_msgs.msg.Imu>createSubscription(
-                sensor_msgs.msg.Imu.class,
-                "imu",
-                new SubscriptionCallback<sensor_msgs.msg.Imu>() {
-                    // We define the callback inline, this works with Java 8's lambdas too, but we use
-                    // our own Consumer interface because Android supports lambdas via retrolambda, but not
-                    // the lambda API
-                    @Override
-                    public void dispatch(sensor_msgs.msg.Imu msg) {
-                        ImuListener.imuCb(msg);
-                    }
-                },
-                QoSProfile.SENSOR_DATA);
+        Node node = new ImuListener();
 
         RCLJava.spin(node);
 
-        sub.dispose();
         node.dispose();
         RCLJava.shutdown();
     }
