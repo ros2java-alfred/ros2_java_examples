@@ -15,10 +15,11 @@
  */
 package org.ros2.rcljava.demo.services;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import org.ros2.rcljava.RCLJava;
-import org.ros2.rcljava.node.Node;
+import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.service.Client;
 
 import example_interfaces.srv.AddTwoInts;
@@ -26,34 +27,51 @@ import example_interfaces.srv.AddTwoInts_Request;
 import example_interfaces.srv.AddTwoInts_Response;
 
 public class AddTwoIntsClient {
-    private static final String NODE_NAME = AddTwoIntsClient.class.getSimpleName().toLowerCase();
+
+    public static class AddTwoIntsClientNode extends NativeNode {
+
+        private static final String NODE_NAME = AddTwoIntsClient.class.getSimpleName().toLowerCase();
+
+        private final Client<AddTwoInts> client;
+
+        public AddTwoIntsClientNode() {
+            super(NODE_NAME);
+
+            this.client = this.<AddTwoInts>createClient(AddTwoInts.class, "add_two_ints");
+        }
+
+        public void getSum() throws InterruptedException, ExecutionException {
+            // Set request.
+            final AddTwoInts_Request request = new AddTwoInts_Request();
+            request.setA(2);
+            request.setB(3);
+
+            // Call service...
+            final Future<AddTwoInts_Response> future = this.client.sendRequest(request);
+            if (future != null) {
+                System.out.println(String.format("Result of add_two_ints: %d", future.get().getSum()));
+            } else {
+                System.out.println("add_two_ints_client was interrupted. Exiting.");
+            }
+        }
+
+        @Override
+        public void dispose() {
+            this.client.dispose();
+            super.dispose();
+        }
+    }
 
     public static void main(String[] args) throws Exception {
         // Initialize RCL
         RCLJava.rclJavaInit();
 
         // Let's create a new Node
-        Node node = RCLJava.createNode(NODE_NAME);
-
-        // Create client.
-        Client<AddTwoInts> client = node.<AddTwoInts>createClient(AddTwoInts.class, "add_two_ints");
-
-        // Set request.
-        AddTwoInts_Request request = new AddTwoInts_Request();
-        request.setA(2);
-        request.setB(3);
-
-        // Call service...
-        Future<AddTwoInts_Response> future = client.sendRequest(request);
-        if (future != null) {
-            System.out.println(String.format("Result of add_two_ints: %d", future.get().getSum()));
-        } else {
-            System.out.println("add_two_ints_client was interrupted. Exiting.");
-        }
+        AddTwoIntsClientNode node = new AddTwoIntsClientNode();
+        node.getSum();
 
         // Release all.
-        client.dispose();
-        node.dispose();
+        node.close();
         RCLJava.shutdown();
     }
 

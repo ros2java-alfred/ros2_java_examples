@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.NativeNode;
+import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.time.WallTimer;
 import org.ros2.rcljava.time.WallTimerCallback;
 
@@ -25,7 +26,7 @@ public class OneOffTimer {
 
     public static class OneOffTimerNode extends NativeNode {
         private int count = 0;
-        private WallTimer periodicTimer;
+        private final WallTimer periodicTimer;
         private WallTimer oneOffTimer;
 
         public OneOffTimerNode() {
@@ -67,9 +68,11 @@ public class OneOffTimer {
     public static void main(String[] args) throws InterruptedException {
         // Initialize RCL
         RCLJava.rclJavaInit(args);
+        Node node = new OneOffTimerNode();
 
-        RCLJava.spin(new OneOffTimerNode());
+        RCLJava.spin(node);
 
+        node.dispose();
         RCLJava.shutdown();
     }
 }

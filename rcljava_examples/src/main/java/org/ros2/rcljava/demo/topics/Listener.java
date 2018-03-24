@@ -21,45 +21,48 @@ import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.Subscription;
 
-public class Listener extends NativeNode {
+public class Listener {
 
-    private static final String NODE_NAME = Listener.class.getSimpleName().toLowerCase();
+    public static class ListenerNode extends NativeNode {
 
-    private Subscription<std_msgs.msg.String> sub;
+        private static final String NODE_NAME = Listener.class.getSimpleName().toLowerCase();
 
-    public Listener(String topic) {
-        super(NODE_NAME);
+        private final Subscription<std_msgs.msg.String> sub;
 
-        SubscriptionCallback<std_msgs.msg.String> callback = new SubscriptionCallback<std_msgs.msg.String>() {
-            // We define the callback inline, this works with Java 8's lambdas too, but we use
-            // our own Consumer interface because Android supports lambdas via retrolambda, but not
-            // the lambda API
-            @Override
-            public void dispatch(std_msgs.msg.String msg) {
-                System.out.println("I heard: [" + msg.getData() + "]");
-            }
-        };
+        public ListenerNode(String topic) {
+            super(NODE_NAME);
 
-        // Subscriptions are type safe, so we'll pass the message type. We use the fully qualified
-        // class name to avoid any collision with Java's String class
-        this.sub = this.<std_msgs.msg.String>createSubscription(
-            std_msgs.msg.String.class,
-            topic,
-            callback);
+            final SubscriptionCallback<std_msgs.msg.String> callback = new SubscriptionCallback<std_msgs.msg.String>() {
+                // We define the callback inline, this works with Java 8's lambdas too, but we use
+                // our own Consumer interface because Android supports lambdas via retrolambda, but not
+                // the lambda API
+                @Override
+                public void dispatch(std_msgs.msg.String msg) {
+                    System.out.println("I heard: [" + msg.getData() + "]");
+                }
+            };
+
+            // Subscriptions are type safe, so we'll pass the message type. We use the fully qualified
+            // class name to avoid any collision with Java's String class
+            this.sub = this.<std_msgs.msg.String>createSubscription(
+                std_msgs.msg.String.class,
+                topic,
+                callback);
+        }
+
+        @Override
+        public void dispose() {
+            this.sub.dispose();
+            super.dispose();
+        }
     }
 
-    @Override
-    public void dispose() {
-        this.sub.dispose();
-        super.dispose();
-    }
-
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
         // Initialize RCL
         RCLJava.rclJavaInit(args);
 
         // Create a node.
-        Node node = new Listener("chatter");
+        Node node = new ListenerNode("chatter");
 
         // spin will block until work comes in, execute work as it becomes available, and keep blocking.
         // It will only be interrupted by Ctrl-C.

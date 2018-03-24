@@ -25,56 +25,59 @@ import org.ros2.rcljava.qos.QoSProfile;
 import org.ros2.rcljava.time.WallTimer;
 import org.ros2.rcljava.time.WallTimerCallback;
 
-public class Talker extends NativeNode {
+public class Talker {
 
-    private static final String NODE_NAME = Talker.class.getSimpleName().toLowerCase();
+    public static class TalkerNode extends NativeNode {
 
-    private int i = 1;
-    private std_msgs.msg.String msg;
-    private Publisher<std_msgs.msg.String> pub;
-    private WallTimer timer;
+        private static final String NODE_NAME = Talker.class.getSimpleName().toLowerCase();
 
-    public Talker(String topic) {
-        super(NODE_NAME);
+        private int i = 1;
+        private final std_msgs.msg.String msg;
+        private final Publisher<std_msgs.msg.String> pub;
+        private final WallTimer timer;
 
-        this.msg = new std_msgs.msg.String();
+        public TalkerNode(String topic) {
+            super(NODE_NAME);
 
-        WallTimerCallback publish_message = new WallTimerCallback() {
+            this.msg = new std_msgs.msg.String();
 
-            @Override
-            public void tick() {
-                msg.setData("Hello World: " + i++);
+            final WallTimerCallback publish_message = new WallTimerCallback() {
 
-                System.out.println("Publishing: \"" + msg.getData() + "\"");
-                pub.publish(msg);
-            }
-        };
+                @Override
+                public void tick() {
+                    msg.setData("Hello World: " + i++);
 
-        QoSProfile qos = QoSProfile.DEFAULT;
-        //TODO qos.setDepth(7);
+                    System.out.println("Publishing: \"" + msg.getData() + "\"");
+                    pub.publish(msg);
+                }
+            };
 
-        this.pub = this.<std_msgs.msg.String>createPublisher(
-                    std_msgs.msg.String.class,
-                    topic,
-                    qos);
+            final QoSProfile qos = QoSProfile.DEFAULT;
+            //TODO qos.setDepth(7);
 
-        this.timer = this.createWallTimer(1, TimeUnit.SECONDS, publish_message);
+            this.pub = this.<std_msgs.msg.String>createPublisher(
+                        std_msgs.msg.String.class,
+                        topic,
+                        qos);
+
+            this.timer = this.createWallTimer(1, TimeUnit.SECONDS, publish_message);
+        }
+
+        @Override
+        public void dispose() {
+            this.timer.dispose();
+            this.pub.dispose();
+            super.dispose();
+        }
     }
 
-    @Override
-    public void dispose() {
-        this.timer.dispose();
-        this.pub.dispose();
-        super.dispose();
-    }
-
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) {
 
         // Initialize RCL
-        RCLJava.rclJavaInit();
+        RCLJava.rclJavaInit(args);
 
         // Let's create a Node
-        Node node = new Talker("chatter");
+        Node node = new TalkerNode("chatter");
 
         RCLJava.spin(node);
 

@@ -16,6 +16,7 @@
 package org.ros2.rcljava.demo.services;
 
 import org.ros2.rcljava.RCLJava;
+import org.ros2.rcljava.node.NativeNode;
 import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.service.Service;
 import org.ros2.rcljava.node.service.ServiceCallback;
@@ -26,50 +27,66 @@ import example_interfaces.srv.AddTwoInts_Request;
 import example_interfaces.srv.AddTwoInts_Response;
 
 public class AddTwoIntsServer {
-    private static final String NODE_NAME = AddTwoIntsServer.class.getSimpleName().toLowerCase();
 
-    public static void handleAddTwoInts(
-            final AddTwoInts_Request request,
-            final AddTwoInts_Response response) {
+    public static class AddTwoIntsServerNode extends NativeNode {
 
-        System.out.println("Incoming request");
-        System.out.println(String.format("a: %d b: %d", request.getA(), request.getB()));
-        response.setSum(request.getA() + request.getB());
+        private static final String NODE_NAME = AddTwoIntsServer.class.getSimpleName().toLowerCase();
+
+        private final Service<AddTwoInts> service;
+
+        public AddTwoIntsServerNode() {
+            super(NODE_NAME);
+
+            // Create a service.
+            this.service = this.<AddTwoInts>createService(
+                    AddTwoInts.class,
+                    "add_two_ints",
+                    new ServiceCallback<AddTwoInts_Request, AddTwoInts_Response>() {
+
+                        // We define the callback inline, this works with Java 8's
+                        // lambdas
+                        // too, but we use our own TriConsumer interface because
+                        // Android
+                        // supports lambdas via retrolambda, but not the lambda API
+                        @Override
+                        public void dispatch(
+                                final RMWRequestId header,
+                                final AddTwoInts_Request request,
+                                final AddTwoInts_Response response) {
+                            AddTwoIntsServerNode.handleAddTwoInts(request, response);
+                        }
+                    });
+
+        }
+
+        public static void handleAddTwoInts(
+                final AddTwoInts_Request request,
+                final AddTwoInts_Response response) {
+
+            System.out.println("Incoming request");
+            System.out.println(String.format("a: %d b: %d", request.getA(), request.getB()));
+            response.setSum(request.getA() + request.getB());
+        }
+
+        @Override
+        public void dispose() {
+            this.service.dispose();
+            super.dispose();
+        }
     }
 
-    public static void main(String[] args) throws Exception {
+    public static void main(String[] args) {
 
         // Initialize RCL
-        RCLJava.rclJavaInit();
+        RCLJava.rclJavaInit(args);
 
         // Let's create a new Node
-        Node node = RCLJava.createNode(NODE_NAME);
-
-        // Create a service.
-        Service<AddTwoInts> service = node.<AddTwoInts>createService(
-                AddTwoInts.class,
-                "add_two_ints",
-                new ServiceCallback<AddTwoInts_Request, AddTwoInts_Response>() {
-
-                    // We define the callback inline, this works with Java 8's
-                    // lambdas
-                    // too, but we use our own TriConsumer interface because
-                    // Android
-                    // supports lambdas via retrolambda, but not the lambda API
-                    @Override
-                    public void dispatch(
-                            final RMWRequestId header,
-                            final AddTwoInts_Request request,
-                            final AddTwoInts_Response response) {
-                        AddTwoIntsServer.handleAddTwoInts(request, response);
-                    }
-                });
+        Node node = new AddTwoIntsServerNode();
 
         // Wait...
         RCLJava.spin(node);
 
         // Release all.
-        service.dispose();
         node.dispose();
         RCLJava.shutdown();
     }

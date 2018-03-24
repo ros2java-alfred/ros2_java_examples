@@ -22,46 +22,49 @@ import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.node.topic.SubscriptionCallback;
 import org.ros2.rcljava.node.topic.Subscription;
 
-public class ListenerBestEffort extends NativeNode {
+public class ListenerBestEffort {
 
-    private Subscription<std_msgs.msg.String> sub;
+    public static class ListenerBestEffortNode extends NativeNode {
 
-    public ListenerBestEffort() {
-        super("listener");
+        private final Subscription<std_msgs.msg.String> sub;
 
-        SubscriptionCallback<std_msgs.msg.String> callback = new SubscriptionCallback<std_msgs.msg.String>(){
-            // We define the callback inline, this works with Java 8's lambdas
-            // too, but we use our own Consumer interface because Android
-            // supports lambdas via retrolambda, but not the lambda API
-            @Override
-            public void dispatch(final std_msgs.msg.String msg) {
-                System.out.println("I heard: " + msg.getData());
-            }
-        };
+        public ListenerBestEffortNode() {
+            super("listener");
 
-        // Subscriptions are type safe, so we'll pass the message type. We use the
-        // fully qualified class name to avoid any collision with Java's String
-        // class
-        this.sub = this.<std_msgs.msg.String>createSubscription(
-                std_msgs.msg.String.class,
-                "chatter",
-                callback,
-                QoSProfile.SENSOR_DATA);
+            final SubscriptionCallback<std_msgs.msg.String> callback = new SubscriptionCallback<std_msgs.msg.String>(){
+                // We define the callback inline, this works with Java 8's lambdas
+                // too, but we use our own Consumer interface because Android
+                // supports lambdas via retrolambda, but not the lambda API
+                @Override
+                public void dispatch(final std_msgs.msg.String msg) {
+                    System.out.println("I heard: " + msg.getData());
+                }
+            };
+
+            // Subscriptions are type safe, so we'll pass the message type. We use the
+            // fully qualified class name to avoid any collision with Java's String
+            // class
+            this.sub = this.<std_msgs.msg.String>createSubscription(
+                    std_msgs.msg.String.class,
+                    "chatter",
+                    callback,
+                    QoSProfile.SENSOR_DATA);
+        }
+
+        @Override
+        public void dispose() {
+            this.sub.dispose();
+            super.dispose();
+        }
     }
 
-    @Override
-    public void dispose() {
-        this.sub.dispose();
-        super.dispose();
-    }
-
-    public static void main(final String[] args) throws InterruptedException {
+    public static void main(final String[] args) {
 
         // Initialize RCL
-        RCLJava.rclJavaInit();
+        RCLJava.rclJavaInit(args);
 
         // Let's create a new Node
-        Node node = new ListenerBestEffort();
+        Node node = new ListenerBestEffortNode();
 
         RCLJava.spin(node);
 

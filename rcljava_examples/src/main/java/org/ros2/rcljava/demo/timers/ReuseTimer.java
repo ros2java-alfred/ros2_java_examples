@@ -18,15 +18,17 @@ import java.util.concurrent.TimeUnit;
 
 import org.ros2.rcljava.RCLJava;
 import org.ros2.rcljava.node.NativeNode;
+import org.ros2.rcljava.node.Node;
 import org.ros2.rcljava.time.WallTimer;
 import org.ros2.rcljava.time.WallTimerCallback;
 
 public class ReuseTimer {
 
     public static class OneOffTimerNode extends NativeNode {
+
         private int count = 0;
-        private WallTimer periodicTimer;
-        private WallTimer oneOffTimer;
+        private final WallTimer periodicTimer;
+        private final WallTimer oneOffTimer;
 
         public OneOffTimerNode() {
             super("reuse_timer");
@@ -41,6 +43,7 @@ public class ReuseTimer {
 
 
             });
+
             // cancel immediately to prevent it running the first time.
             this.oneOffTimer.cancel();
 
@@ -71,8 +74,10 @@ public class ReuseTimer {
         // Initialize RCL
         RCLJava.rclJavaInit(args);
 
-        RCLJava.spin(new OneOffTimerNode());
+        Node node = new OneOffTimerNode();
+        RCLJava.spin(node);
 
+        node.dispose();
         RCLJava.shutdown();
     }
 }
