@@ -2,7 +2,7 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>rcljava_examples</name>
-  <version>0.4.0</version>
+  <version>0.5.0</version>
   <description>Package containing examples of how to use the rcljava API.</description>
   <maintainer email="mick.gaillard@gmail.com">Mickael Gaillard</maintainer>
   <license>Apache License 2.0</license>
